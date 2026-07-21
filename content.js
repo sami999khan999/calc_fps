@@ -31,7 +31,7 @@
 
   function clampSize(v) {
     const n = parseFloat(v);
-    return isFinite(n) ? Math.max(0.5, Math.min(2.5, n)) : 1;
+    return isFinite(n) ? Math.max(0.1, Math.min(2.5, n)) : 1;
   }
 
   ext.storage.local.get([BIND_KEY, SIZE_KEY], (data) => {
@@ -103,7 +103,7 @@
     }
   });
 
-  // --- Seven-segment display ---
+  // --- Seven-segment display (Minimal, background-free) ---
 
   const SEG_NAMES = ["a", "b", "c", "d", "e", "f", "g"];
   const DIGIT_SEGS = {
@@ -123,71 +123,55 @@
   const STYLE = `
     * { box-sizing: border-box; }
     .meter {
-      padding: 6px;
-      border-radius: 14px;
-      background: linear-gradient(180deg, #43484d, #23272b);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      display: inline-flex;
+      padding: 0;
+      background: transparent;
+      box-shadow: none;
+      border: none;
+      transition: transform 0.2s ease, opacity 0.2s ease;
     }
     .meter.dragging {
-      transform: scale(1.15);
-      opacity: 0.9;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    }
-    .lcd {
-      position: relative;
-      border-radius: 8px;
-      padding: 22px 14px 11px;
-      background: linear-gradient(160deg, #16201a 0%, #0e1511 55%, #0a100c 100%);
-      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.7), inset 0 -1px 2px rgba(255, 255, 255, 0.06);
-    }
-    .ann {
-      position: absolute;
-      top: 7px;
-      left: 12px;
-      font: 700 9px/1 -apple-system, "Segoe UI", Arial, sans-serif;
-      letter-spacing: 2px;
-      color: #86efac;
-      opacity: 0.75;
+      transform: scale(1.1);
+      opacity: 0.85;
     }
     .digits {
       display: flex;
-      gap: 7px;
+      gap: 3px;
       transform: skewX(-4deg);
     }
     .digit {
       position: relative;
-      width: 28px;
-      height: 48px;
+      width: 14px;
+      height: 24px;
     }
     .seg {
       position: absolute;
       background: #4ade80;
-      opacity: 0.06;
+      opacity: 0.08;
       transition: opacity 0.06s linear;
     }
     .seg.on {
       opacity: 1;
-      filter: drop-shadow(0 0 3px rgba(74, 222, 128, 0.6));
+      filter: drop-shadow(0 0 2px rgba(74, 222, 128, 0.7));
     }
     .seg.h {
-      left: 4px;
-      width: 20px;
-      height: 6px;
+      left: 2px;
+      width: 10px;
+      height: 3px;
       clip-path: polygon(15% 0, 85% 0, 100% 50%, 85% 100%, 15% 100%, 0 50%);
     }
     .seg.v {
-      width: 6px;
-      height: 17px;
+      width: 3px;
+      height: 9px;
       clip-path: polygon(0 15%, 50% 0, 100% 15%, 100% 85%, 50% 100%, 0 85%);
     }
     .seg.a { top: 0; }
-    .seg.g { top: 21px; }
+    .seg.g { top: 10.5px; }
     .seg.d { bottom: 0; }
-    .seg.f { left: 0; top: 3.5px; }
-    .seg.b { right: 0; top: 3.5px; }
-    .seg.e { left: 0; bottom: 3.5px; }
-    .seg.c { right: 0; bottom: 3.5px; }
+    .seg.f { left: 0; top: 1.8px; }
+    .seg.b { right: 0; top: 1.8px; }
+    .seg.e { left: 0; bottom: 1.8px; }
+    .seg.c { right: 0; bottom: 1.8px; }
   `;
 
   function buildMeter() {
@@ -213,14 +197,6 @@
     meterEl.className = "meter";
     meterEl.style.zoom = sizeScale;
 
-    const lcd = document.createElement("div");
-    lcd.className = "lcd";
-
-    const ann = document.createElement("div");
-    ann.className = "ann";
-    ann.textContent = "FPS";
-    lcd.appendChild(ann);
-
     const digits = document.createElement("div");
     digits.className = "digits";
 
@@ -240,8 +216,7 @@
       digitEls.push(segMap);
     }
 
-    lcd.appendChild(digits);
-    meterEl.appendChild(lcd);
+    meterEl.appendChild(digits);
     shadow.appendChild(meterEl);
 
     setupDrag();
@@ -253,6 +228,7 @@
     for (let i = 0; i < 3; i++) {
       const segs = DIGIT_SEGS[text3[i]] || "";
       const map = digitEls[i];
+      if (!map) continue;
       for (const name of SEG_NAMES) {
         map[name].classList.toggle("on", segs.includes(name));
       }
@@ -402,7 +378,7 @@
 
     if (!host) buildMeter();
     lastShown = null;
-    renderText("   "); // ghost segments until the first measurement
+    renderText("--"); // placeholder until the first measurement
     (document.body || document.documentElement).appendChild(host);
 
     // Apply saved position before revealing, with the spring transition
