@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>FPS Meter</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <div class="logo-lcd">
+      <div class="digits" id="logoDigits"></div>
+    </div>
+    <div class="title">
+      <h1>FPS Meter</h1>
+      <p>Per-tab frame rate display</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" id="toggleCard">
+      <div class="card-text">
+        <h2>Show on this tab</h2>
+        <p id="toggleHint">Checking&hellip;</p>
+      </div>
+      <button class="switch" id="switchBtn" role="switch" aria-checked="false" aria-label="Show FPS on this tab">
+        <span class="knob"></span>
+      </button>
+    </section>
+
+    <section class="card column">
+      <div class="row">
+        <div class="card-text">
+          <h2>Meter size</h2>
+          <p>Scales the on-page display</p>
+        </div>
+        <span class="size-value" id="sizeValue">100%</span>
+      </div>
+      <input type="range" id="sizeSlider" min="20" max="200" step="5" value="100" aria-label="Meter size" />
+    </section>
+
+    <section class="card column">
+      <div class="card-text">
+        <h2>Keyboard shortcut</h2>
+        <p>Toggles the meter on the current tab</p>
+      </div>
+      <button class="bind" id="bindBtn" title="Click to change the shortcut">
+        <span class="bind-keys" id="bindKeys"></span>
+      </button>
+      <p class="hint" id="bindHint">Click above, then press a combo &middot; Esc cancels</p>
+    </section>
+  </main>
+
+  <footer>
+    Drag the meter to move it &mdash; it springs to the nearest edge and remembers its spot.
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>

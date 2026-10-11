@@ -15,7 +15,9 @@ A lightweight browser extension (Manifest V3) that shows the frame rate of the c
 
 1. Open `chrome://extensions` (or `edge://extensions`).
 2. Enable **Developer mode**.
-3. Click **Load unpacked** and select this folder.
+3. Click **Load unpacked** and select the `release/` folder.
+
+`release/` is the built extension and is committed, so no build is needed; after changing the code, run `node build.js` and commit `release/` with it.
 
 ## Usage
 
